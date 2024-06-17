@@ -1,0 +1,2 @@
+GO_Molecular_Function_2023
+GO_Biological_Process_2023

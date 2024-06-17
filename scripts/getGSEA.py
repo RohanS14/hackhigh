@@ -2,21 +2,33 @@
 
 import pandas as pd
 import gseapy as gp
+import yaml
 import sys
 
+# Sample list argument
 if len(sys.argv) < 2 :
-    print("Usage: python getGSEA.py {path to sample list}")
-    sys.exit(1)
+    print("Defaulting to all samples")
+else :
+    sampleList = sys.argv[1]
 
-sampleList = sys.argv[1]
+# Set up yaml
+with open('./input/config.yaml', 'r') as f:
+    config = yaml.safe_load(f)
 
-# Import file
-file = pd.read_csv("../data/data_mrna_seq_v2_rsem_zscores_ref_diploid_samples.txt", sep='\t')
+# Import data file
+file = pd.read_csv(config['dataFile'], sep='\t')
 cleanfile = file.dropna()
 
+# Import gene set file
+with open(config['geneSetFile'], 'r') as file:
+    geneSets = [line.strip() for line in file]
+
 # Get list of samples
-with open(sampleList, 'r') as file:
-    column_names = [line.strip() for line in file]
+if len(sys.argv) == 2   :
+    with open(sampleList, 'r') as file:
+        column_names = [line.strip() for line in file]
+else :
+    column_names = cleanfile.columns.tolist()[2:]
 
 cleanfile['Average'] = cleanfile[column_names].mean(axis=1)
 
@@ -30,7 +42,7 @@ cleanfile_sample_sorted = cleanfile_sample.sort_values(by='Sample', ascending=Fa
 
 # Rank
 pre_res = gp.prerank(rnk=cleanfile_sample_sorted, # or rnk = rnk,
-                     gene_sets='GO_Molecular_Function_2023',
+                     gene_sets=geneSets,
                      seed=6
                     )
 
@@ -46,6 +58,6 @@ for term in pre_res.results.keys():
 
 outlist=pd.DataFrame(outlist, columns=['Term', 'pval', 'fdr','nes','es','gene'])
 
-outlist.sort_values(by='pval')
+outlist = outlist.sort_values(by='pval')
 
-outlist.to_csv('../results/gsea1.csv', index=False)
+outlist.to_csv(config['resultFile'], index=False)
