@@ -2,15 +2,29 @@
 
 import pandas as pd
 import gseapy as gp
+import sys
 
+if len(sys.argv) < 2 :
+    print("Usage: python getGSEA.py {path to sample list}")
+    sys.exit(1)
+
+sampleList = sys.argv[1]
 
 # Import file
 file = pd.read_csv("../data/data_mrna_seq_v2_rsem_zscores_ref_diploid_samples.txt", sep='\t')
 cleanfile = file.dropna()
 
+# Get list of samples
+with open(sampleList, 'r') as file:
+    column_names = [line.strip() for line in file]
+
+cleanfile['Average'] = cleanfile[column_names].mean(axis=1)
+
+
 # Get the dataframe for one sample
-cleanfile_sample = {'Gene':cleanfile['Hugo_Symbol'], 'Sample':cleanfile["TCGA-OR-A5J1-01"] }
+cleanfile_sample = {'Gene':cleanfile['Hugo_Symbol'], 'Sample':cleanfile["Average"] }
 cleanfile_sample = pd.DataFrame(cleanfile_sample)
+
 
 cleanfile_sample_sorted = cleanfile_sample.sort_values(by='Sample', ascending=False)
 
