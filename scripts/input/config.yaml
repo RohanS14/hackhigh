@@ -2,7 +2,7 @@
 dataFile: "../data/uvm_tgca.txt"
 
 # Gene set to use
-geneSetFile: "./input/defaultGeneSets.txt"
+geneSetFile: "./input/easyGeneSet.txt"
 
 # Output file
-resultFile: "../results/gsea1_uvm_all.csv"
+resultFile: "../results/gsea_test_uvm_all.csv"

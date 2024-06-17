@@ -57,24 +57,16 @@ def main():
     # Sample list argument
     if len(sys.argv) < 2 :
         print("Defaulting to all samples")
+        sampleList = None
     else :
         sampleList = sys.argv[1]
 
     # Set up yaml
     with open('./input/config.yaml', 'r') as f:
         config = yaml.safe_load(f)
-
-    # Import data file
-    dataFile = pd.read_csv(config['dataFile'], sep='\t')
-    
-    # Import gene set file
-    geneSetFile = config['geneSetFile']
-    
-    # Result file
-    result_file = config['resultFile']
     
     # Run GSEA
-    pre_res = getGSEA(geneSetFile, dataFile, sampleList=None, resultFile=None)
+    pre_res = getGSEA(config['geneSetFile'], config['dataFile'], sampleList=sampleList, resultFile=config['resultFile'])
     
 if __name__ == "__main__":
     main()
